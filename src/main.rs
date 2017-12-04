@@ -184,6 +184,9 @@ fn sync(workspaces: &[Workspace],
             if pkg.source_id().is_path() {
                 continue
             }
+            if resolve.replacement(pkg).is_some() {
+                continue
+            }
             ids.insert(pkg.clone(), packages.get(pkg).chain_err(|| {
                 "failed to fetch package"
             })?.clone());
