@@ -184,6 +184,19 @@ fn sync(workspaces: &[Workspace],
             if pkg.source_id().is_path() {
                 continue
             }
+            match resolve.replacement(pkg) {
+                Some(replacement) => {
+                    if !replacement.source_id().is_path() {
+                        // we're going to be vendoring the replacement, so we
+                        // don't need to vendor `pkg`. In theory we should be
+                        // able to skip vendoring for `pkg` even if the
+                        // replacement is a path source, but in practice cargo
+                        // fails to build in that scenario.
+                        continue;
+                    }
+                },
+                None => ()
+            };
             ids.insert(pkg.clone(), packages.get(pkg).chain_err(|| {
                 "failed to fetch package"
             })?.clone());
